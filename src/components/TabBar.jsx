@@ -52,7 +52,7 @@ export default function TabBar({ currentTab = 'tin-tuc', onTabChange }) {
               minWidth: 'fit-content',
               py: { xs: 0.7, sm: 2 },
               px: { xs: 1.5, sm: 3   },
-              borderRadius: '20px',
+              borderRadius: '32px',
               fontSize: { xs: '0.78rem', sm: '0.84rem' },
               fontWeight: isActive ? 700 : 500,
               color: '#ffffff',

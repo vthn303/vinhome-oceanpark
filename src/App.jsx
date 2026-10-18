@@ -57,6 +57,7 @@ function App() {
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/news" element={<HomePage />} />
               <Route path="/news/:id" element={<NewsDetail />} />
               <Route path="*" element={<HomePage />} />
             </Routes>
