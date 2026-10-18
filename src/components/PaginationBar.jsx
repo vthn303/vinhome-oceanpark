@@ -1,15 +1,4 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Select,
-  MenuItem,
-  Button,
-} from '@mui/material';
-import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 
 export default function PaginationBar({
   currentPage = 1,
@@ -25,48 +14,36 @@ export default function PaginationBar({
     }
   };
 
-  const navButtonSx = {
-    minWidth: 32,
-    width: 32,
-    height: 32,
-    p: 0,
-    borderRadius: '6px',
-    border: '1px solid #e2e8f0',
-    color: '#64748b',
-    bgcolor: '#ffffff',
-    fontSize: '0.82rem',
-    fontWeight: 500,
-    '&:hover': {
-      bgcolor: '#f1f5f9',
-      borderColor: '#cbd5e1',
-    },
-    '&:disabled': {
-      color: '#cbd5e1',
-      borderColor: '#f1f5f9',
-    },
-  };
-
-  // Generate dynamic page list
   const renderPageNumbers = () => {
     if (safeTotalPages <= 5) {
-      return Array.from({ length: safeTotalPages }, (_, i) => i + 1).map((pg) => (
-        <Button
-          key={pg}
-          onClick={() => onPageChange && onPageChange(pg)}
-          sx={{
-            ...navButtonSx,
-            bgcolor: safeCurrentPage === pg ? '#1565c0' : '#ffffff',
-            color: safeCurrentPage === pg ? '#ffffff' : '#64748b',
-            borderColor: safeCurrentPage === pg ? '#1565c0' : '#e2e8f0',
-            fontWeight: safeCurrentPage === pg ? 700 : 500,
-            '&:hover': {
-              bgcolor: safeCurrentPage === pg ? '#0d47a1' : '#f1f5f9',
-            },
-          }}
-        >
-          {pg}
-        </Button>
-      ));
+      return Array.from({ length: safeTotalPages }, (_, i) => i + 1).map((pg) => {
+        const isCurrent = safeCurrentPage === pg;
+        return (
+          <li key={pg} className={`page-item ${isCurrent ? 'active' : ''}`}>
+            <button
+              type="button"
+              className="page-link"
+              onClick={() => onPageChange && onPageChange(pg)}
+              style={{
+                backgroundColor: isCurrent ? '#1565c0' : '#ffffff',
+                borderColor: isCurrent ? '#1565c0' : '#dee2e6',
+                color: isCurrent ? '#ffffff' : '#64748b',
+                fontWeight: isCurrent ? 700 : 500,
+                minWidth: '34px',
+                height: '34px',
+                padding: '0 6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '6px',
+                margin: '0 2px',
+              }}
+            >
+              {pg}
+            </button>
+          </li>
+        );
+      });
     }
 
     // Dynamic sliding window around current page
@@ -83,162 +60,181 @@ export default function PaginationBar({
       <>
         {!pages.includes(1) && (
           <>
-            <Button
-              onClick={() => onPageChange && onPageChange(1)}
-              sx={{
-                ...navButtonSx,
-                bgcolor: safeCurrentPage === 1 ? '#1565c0' : '#ffffff',
-                color: safeCurrentPage === 1 ? '#ffffff' : '#64748b',
-                borderColor: safeCurrentPage === 1 ? '#1565c0' : '#e2e8f0',
-              }}
-            >
-              1
-            </Button>
-            {pages[0] > 2 && (
-              <Typography sx={{ color: '#94a3b8', px: 0.5, fontSize: '0.9rem' }}>
-                ...
-              </Typography>
-            )}
+            <li className={`page-item ${safeCurrentPage === 1 ? 'active' : ''}`}>
+              <button
+                type="button"
+                className="page-link"
+                onClick={() => onPageChange && onPageChange(1)}
+                style={{
+                  backgroundColor: safeCurrentPage === 1 ? '#1565c0' : '#ffffff',
+                  borderColor: safeCurrentPage === 1 ? '#1565c0' : '#dee2e6',
+                  color: safeCurrentPage === 1 ? '#ffffff' : '#64748b',
+                  minWidth: '34px',
+                  height: '34px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '6px',
+                  margin: '0 2px',
+                }}
+              >
+                1
+              </button>
+            </li>
+            {pages[0] > 2 && <li className="page-item disabled"><span className="page-link border-0">...</span></li>}
           </>
         )}
 
-        {pages.map((pg) => (
-          <Button
-            key={pg}
-            onClick={() => onPageChange && onPageChange(pg)}
-            sx={{
-              ...navButtonSx,
-              bgcolor: safeCurrentPage === pg ? '#1565c0' : '#ffffff',
-              color: safeCurrentPage === pg ? '#ffffff' : '#64748b',
-              borderColor: safeCurrentPage === pg ? '#1565c0' : '#e2e8f0',
-              fontWeight: safeCurrentPage === pg ? 700 : 500,
-              '&:hover': {
-                bgcolor: safeCurrentPage === pg ? '#0d47a1' : '#f1f5f9',
-              },
-            }}
-          >
-            {pg}
-          </Button>
-        ))}
+        {pages.map((pg) => {
+          const isCurrent = safeCurrentPage === pg;
+          return (
+            <li key={pg} className={`page-item ${isCurrent ? 'active' : ''}`}>
+              <button
+                type="button"
+                className="page-link"
+                onClick={() => onPageChange && onPageChange(pg)}
+                style={{
+                  backgroundColor: isCurrent ? '#1565c0' : '#ffffff',
+                  borderColor: isCurrent ? '#1565c0' : '#dee2e6',
+                  color: isCurrent ? '#ffffff' : '#64748b',
+                  fontWeight: isCurrent ? 700 : 500,
+                  minWidth: '34px',
+                  height: '34px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '6px',
+                  margin: '0 2px',
+                }}
+              >
+                {pg}
+              </button>
+            </li>
+          );
+        })}
 
         {!pages.includes(safeTotalPages) && (
           <>
             {pages[pages.length - 1] < safeTotalPages - 1 && (
-              <Typography sx={{ color: '#94a3b8', px: 0.5, fontSize: '0.9rem' }}>
-                ...
-              </Typography>
+              <li className="page-item disabled"><span className="page-link border-0">...</span></li>
             )}
-            <Button
-              onClick={() => onPageChange && onPageChange(safeTotalPages)}
-              sx={{
-                ...navButtonSx,
-                bgcolor: safeCurrentPage === safeTotalPages ? '#1565c0' : '#ffffff',
-                color: safeCurrentPage === safeTotalPages ? '#ffffff' : '#64748b',
-                borderColor: safeCurrentPage === safeTotalPages ? '#1565c0' : '#e2e8f0',
-              }}
-            >
-              {safeTotalPages}
-            </Button>
+            <li className={`page-item ${safeCurrentPage === safeTotalPages ? 'active' : ''}`}>
+              <button
+                type="button"
+                className="page-link"
+                onClick={() => onPageChange && onPageChange(safeTotalPages)}
+                style={{
+                  backgroundColor: safeCurrentPage === safeTotalPages ? '#1565c0' : '#ffffff',
+                  borderColor: safeCurrentPage === safeTotalPages ? '#1565c0' : '#dee2e6',
+                  color: safeCurrentPage === safeTotalPages ? '#ffffff' : '#64748b',
+                  minWidth: '34px',
+                  height: '34px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '6px',
+                  margin: '0 2px',
+                }}
+              >
+                {safeTotalPages}
+              </button>
+            </li>
           </>
         )}
       </>
     );
   };
 
+  const btnStyle = {
+    minWidth: '34px',
+    height: '34px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '6px',
+    margin: '0 2px',
+    color: '#64748b',
+  };
+
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: 2,
-        mt: 4,
-        mb: 6,
-        pt: 1,
-      }}
-    >
+    <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mt-4 mb-5 pt-2">
       {/* Left: Trang [Select] Của [totalPages] */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Typography sx={{ color: '#475569', fontSize: '0.85rem' }}>
-          Trang
-        </Typography>
-        <Select
-          size="small"
+      <div className="d-flex align-items-center gap-2">
+        <span className="text-secondary small">Trang</span>
+        <select
           value={safeCurrentPage}
           onChange={handleSelectChange}
-          sx={{
-            height: 32,
-            minWidth: 54,
-            fontSize: '0.85rem',
-            color: '#1e293b',
-            bgcolor: '#ffffff',
-            borderRadius: '6px',
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: '#e2e8f0',
-            },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: '#cbd5e1',
-            },
-            '& .MuiSelect-select': {
-              py: '4px',
-              pl: '10px',
-              pr: '24px !important',
-            },
-          }}
+          className="form-select form-select-sm"
+          style={{ width: 'auto', minWidth: '60px' }}
         >
           {Array.from({ length: safeTotalPages }, (_, i) => i + 1).map((pg) => (
-            <MenuItem key={pg} value={pg} sx={{ fontSize: '0.85rem' }}>
+            <option key={pg} value={pg}>
               {pg}
-            </MenuItem>
+            </option>
           ))}
-        </Select>
-        <Typography sx={{ color: '#475569', fontSize: '0.85rem' }}>
-          Của {safeTotalPages}
-        </Typography>
-      </Box>
+        </select>
+        <span className="text-secondary small">Của {safeTotalPages}</span>
+      </div>
 
-      {/* Right: Navigation Page Buttons */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-        {/* First */}
-        <Button
-          onClick={() => onPageChange && onPageChange(1)}
-          disabled={safeCurrentPage === 1}
-          sx={navButtonSx}
-        >
-          <KeyboardDoubleArrowLeftIcon sx={{ fontSize: 16 }} />
-        </Button>
+      {/* Right: Pagination Controls */}
+      <nav aria-label="Page navigation">
+        <ul className="pagination pagination-sm mb-0 align-items-center">
+          {/* First */}
+          <li className={`page-item ${safeCurrentPage === 1 ? 'disabled' : ''}`}>
+            <button
+              type="button"
+              className="page-link"
+              onClick={() => onPageChange && onPageChange(1)}
+              disabled={safeCurrentPage === 1}
+              style={btnStyle}
+            >
+              <i className="bi bi-chevron-double-left" />
+            </button>
+          </li>
 
-        {/* Prev */}
-        <Button
-          onClick={() => onPageChange && onPageChange(Math.max(1, safeCurrentPage - 1))}
-          disabled={safeCurrentPage === 1}
-          sx={navButtonSx}
-        >
-          <KeyboardArrowLeftIcon sx={{ fontSize: 16 }} />
-        </Button>
+          {/* Prev */}
+          <li className={`page-item ${safeCurrentPage === 1 ? 'disabled' : ''}`}>
+            <button
+              type="button"
+              className="page-link"
+              onClick={() => onPageChange && onPageChange(Math.max(1, safeCurrentPage - 1))}
+              disabled={safeCurrentPage === 1}
+              style={btnStyle}
+            >
+              <i className="bi bi-chevron-left" />
+            </button>
+          </li>
 
-        {/* Dynamic Page Numbers */}
-        {renderPageNumbers()}
+          {/* Dynamic Page Numbers */}
+          {renderPageNumbers()}
 
-        {/* Next */}
-        <Button
-          onClick={() => onPageChange && onPageChange(Math.min(safeTotalPages, safeCurrentPage + 1))}
-          disabled={safeCurrentPage === safeTotalPages}
-          sx={navButtonSx}
-        >
-          <KeyboardArrowRightIcon sx={{ fontSize: 16 }} />
-        </Button>
+          {/* Next */}
+          <li className={`page-item ${safeCurrentPage === safeTotalPages ? 'disabled' : ''}`}>
+            <button
+              type="button"
+              className="page-link"
+              onClick={() => onPageChange && onPageChange(Math.min(safeTotalPages, safeCurrentPage + 1))}
+              disabled={safeCurrentPage === safeTotalPages}
+              style={btnStyle}
+            >
+              <i className="bi bi-chevron-right" />
+            </button>
+          </li>
 
-        {/* Last */}
-        <Button
-          onClick={() => onPageChange && onPageChange(safeTotalPages)}
-          disabled={safeCurrentPage === safeTotalPages}
-          sx={navButtonSx}
-        >
-          <KeyboardDoubleArrowRightIcon sx={{ fontSize: 16 }} />
-        </Button>
-      </Box>
-    </Box>
+          {/* Last */}
+          <li className={`page-item ${safeCurrentPage === safeTotalPages ? 'disabled' : ''}`}>
+            <button
+              type="button"
+              className="page-link"
+              onClick={() => onPageChange && onPageChange(safeTotalPages)}
+              disabled={safeCurrentPage === safeTotalPages}
+              style={btnStyle}
+            >
+              <i className="bi bi-chevron-double-right" />
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
   );
 }

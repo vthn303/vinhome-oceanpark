@@ -1,1 +1,24 @@
-/* Custom styles if needed */
+/* Custom project styles */
+.news-article-content img {
+  max-width: 100%;
+  height: auto !important;
+  border-radius: 12px;
+  margin: 20px auto;
+  display: block;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+.news-article-content p {
+  margin-bottom: 1.25rem;
+  line-height: 1.85;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

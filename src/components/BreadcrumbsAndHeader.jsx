@@ -1,14 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Breadcrumbs,
-  Link,
-  Button,
-  Snackbar,
-  Alert,
-} from '@mui/material';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { Link } from 'react-router-dom';
 
 export default function BreadcrumbsAndHeader() {
   const [copied, setCopied] = useState(false);
@@ -17,120 +8,79 @@ export default function BreadcrumbsAndHeader() {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
       setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
     }
   };
 
   return (
-    <Box sx={{ pt: 2.5, pb: 2 }}>
+    <div className="pt-3 pb-2">
       {/* Breadcrumb */}
-      <Breadcrumbs
-        separator="/"
-        aria-label="breadcrumb"
-        sx={{
-          mb: 1.5,
-          fontSize: '0.85rem',
-          '& .MuiBreadcrumbs-separator': {
-            color: '#94a3b8',
-            mx: 0.8,
-          },
-        }}
-      >
-        <Link
-          underline="hover"
-          href="#"
-          sx={{
-            color: '#1565c0',
-            fontWeight: 500,
-            fontSize: '0.85rem',
-          }}
-        >
-          Dự án
-        </Link>
-        <Typography
-          sx={{
-            color: '#1e293b',
-            fontSize: '0.85rem',
-            fontWeight: 500,
-          }}
-        >
-          Vinhomes Ocean Park 3
-        </Typography>
-      </Breadcrumbs>
+      <nav aria-label="breadcrumb" className="mb-2">
+        <ol className="breadcrumb mb-0" style={{ fontSize: '0.85rem' }}>
+          <li className="breadcrumb-item">
+            <Link to="/" className="text-decoration-none fw-medium" style={{ color: '#1565c0' }}>
+              Dự án
+            </Link>
+          </li>
+          <li className="breadcrumb-item active text-dark fw-medium" aria-current="page">
+            Vinhomes Ocean Park 3
+          </li>
+        </ol>
+      </nav>
 
       {/* Main Title Row */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: { xs: 'flex-start', sm: 'center' },
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: 2,
-        }}
-      >
-        <Box>
-          <Typography
-            variant="h4"
-            component="h1"
-            sx={{
-              fontWeight: 800,
-              fontSize: { xs: '1.6rem', sm: '2rem', md: '2.2rem' },
+      <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+        <div>
+          <h1
+            className="fw-bold mb-1"
+            style={{
               color: '#1555a6',
+              fontSize: 'calc(1.4rem + 1vw)',
               letterSpacing: '-0.3px',
-              mb: 0.5,
             }}
           >
             VINHOMES OCEAN PARK 3
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              color: '#64748b',
-              fontSize: { xs: '0.82rem', sm: '0.9rem' },
-              fontWeight: 400,
-              lineHeight: 1.5,
-            }}
-          >
+          </h1>
+          <p className="text-muted mb-0" style={{ fontSize: '0.9rem', lineHeight: 1.5 }}>
             Theo dõi thông tin chi tiết và bảng giá, mặt bằng, tiến độ và chính sách bán hàng dự án VINHOMES OCEAN PARK 3.
-          </Typography>
-        </Box>
+          </p>
+        </div>
 
         {/* Share Button */}
-        <Button
-          variant="contained"
+        <button
+          type="button"
           onClick={handleShare}
-          endIcon={<OpenInNewIcon sx={{ fontSize: '18px !important' }} />}
-          sx={{
-            background: 'linear-gradient(90deg, #2A52BE 0%, #00B4D8 100%)',
-            color: '#ffffff',
-            px: 2.5,
-            py: 0.9,
+          className="btn text-white fw-semibold d-inline-flex align-items-center gap-2 px-3 py-2 text-nowrap align-self-start align-self-sm-auto"
+          style={{
+            backgroundColor: '#0288d1',
             borderRadius: '6px',
             fontSize: '0.88rem',
-            fontWeight: 600,
-            boxShadow: 'none',
-            whiteSpace: 'nowrap',
-            '&:hover': {
-              bgcolor: '#0277bd',
-              boxShadow: '0 2px 8px rgba(2, 136, 209, 0.3)',
-              transition: 'all 0.1s ease-in-out',
-            },
+            border: 'none',
+            boxShadow: '0 2px 6px rgba(2, 136, 209, 0.25)',
           }}
         >
-          Chia sẻ
-        </Button>
-      </Box>
+          <span>Chia sẻ</span>
+          <i className="bi bi-box-arrow-up-right" style={{ fontSize: '14px' }} />
+        </button>
+      </div>
 
-      <Snackbar
-        open={copied}
-        autoHideDuration={3000}
-        onClose={() => setCopied(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="success" sx={{ width: '100%' }}>
-          Đã sao chép liên kết chia sẻ!
-        </Alert>
-      </Snackbar>
-    </Box>
+      {/* Copied Toast Alert */}
+      {copied && (
+        <div
+          className="alert alert-success alert-dismissible fade show mt-3 py-2 px-3 d-flex align-items-center gap-2 mb-0"
+          role="alert"
+          style={{ fontSize: '0.85rem' }}
+        >
+          <i className="bi bi-check-circle-fill text-success" />
+          <span>Đã sao chép liên kết chia sẻ!</span>
+          <button
+            type="button"
+            className="btn-close py-2 px-3"
+            onClick={() => setCopied(false)}
+            aria-label="Close"
+          />
+        </div>
+      )}
+    </div>
   );
 }
-

@@ -1,21 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Breadcrumbs,
-  Link,
-  Button,
-  Container,
-  Grid,
-  Skeleton,
-  Alert,
-  Snackbar,
-} from '@mui/material';
-import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
-import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getNewsDetail, searchNews } from '../api/newsApi';
 import NewsCard from './NewsCard';
 
@@ -57,7 +41,7 @@ export default function NewsDetail() {
           setError('Không tìm thấy bài viết');
         }
 
-        // Fetch related news (TIN LIÊN QUAN: danh sách 4 tin tức cùng dự án sắp xếp theo ngày tạo mới nhất)
+        // Fetch related news (TIN LIÊN QUAN: 4 tin cùng dự án sắp xếp theo ngày tạo mới nhất)
         const relatedParams = {
           pageSize: 4,
           sort: 'createdAt:desc',
@@ -86,278 +70,184 @@ export default function NewsDetail() {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
       setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
     }
   };
 
   if (loading) {
     return (
-      <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4 }, py: 4 }}>
-        <Skeleton variant="text" width="280px" height={28} sx={{ mb: 2 }} />
-        <Skeleton variant="text" width="80%" height={50} sx={{ mb: 2 }} />
-        <Skeleton variant="text" width="40%" height={24} sx={{ mb: 3 }} />
-        <Skeleton variant="rounded" width="100%" height={400} sx={{ borderRadius: '14px', mb: 4 }} />
-        <Skeleton variant="text" sx={{ mb: 1.5 }} />
-        <Skeleton variant="text" sx={{ mb: 1.5 }} />
-        <Skeleton variant="text" width="85%" sx={{ mb: 1.5 }} />
-      </Container>
+      <div className="container-xl px-3 px-md-4 py-4 placeholder-glow">
+        <span className="placeholder col-3 mb-3 d-block" />
+        <span className="placeholder col-8 mb-2 d-block" style={{ height: '36px' }} />
+        <span className="placeholder col-4 mb-4 d-block" />
+        <div className="placeholder col-12 rounded-3 mb-4" style={{ height: '380px' }} />
+        <span className="placeholder col-12 mb-2 d-block" />
+        <span className="placeholder col-12 mb-2 d-block" />
+        <span className="placeholder col-9 mb-2 d-block" />
+      </div>
     );
   }
 
   if (error || !news) {
     return (
-      <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4 }, py: 6 }}>
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error || 'Không tìm thấy nội dung bài viết.'}
-        </Alert>
-        <Button
-          variant="outlined"
-          startIcon={<ArrowBackIcon />}
+      <div className="container-xl px-3 px-md-4 py-5 text-center">
+        <div className="alert alert-danger mb-4">{error || 'Không tìm thấy nội dung bài viết.'}</div>
+        <button
+          type="button"
+          className="btn btn-outline-primary d-inline-flex align-items-center gap-2"
           onClick={() => navigate('/')}
         >
-          Quay lại trang chủ
-        </Button>
-      </Container>
+          <i className="bi bi-arrow-left" />
+          <span>Quay lại trang chủ</span>
+        </button>
+      </div>
     );
   }
 
   const formattedDate = formatDate(news.createdAt);
-  const authorName = news.updatedByName || 'Vinhomes.biz.vn';
+  const authorName = news.updatedByName || 'Admin';
   const projectName = news.projectName || 'Vinhomes Ocean Park 3';
 
   return (
-    <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4 }, py: 3 }}>
+    <div className="container-xl px-3 px-md-4 py-3">
       {/* Breadcrumbs */}
-      <Breadcrumbs
-        separator="/"
-        aria-label="breadcrumb"
-        sx={{
-          mb: 2,
-          fontSize: '0.85rem',
-          '& .MuiBreadcrumbs-separator': {
-            color: '#94a3b8',
-            mx: 0.8,
-          },
-        }}
-      >
-        <Link
-          component={RouterLink}
-          to="/"
-          underline="hover"
-          sx={{ color: '#1565c0', fontWeight: 500 }}
-        >
-          Dự án
-        </Link>
-        <Link
-          component={RouterLink}
-          to="/"
-          underline="hover"
-          sx={{ color: '#1565c0', fontWeight: 500 }}
-        >
-          {projectName}
-        </Link>
-        <Typography sx={{ color: '#475569', fontWeight: 500 }}>
-          Tin tức
-        </Typography>
-      </Breadcrumbs>
+      <nav aria-label="breadcrumb" className="mb-3">
+        <ol className="breadcrumb mb-0" style={{ fontSize: '0.85rem' }}>
+          <li className="breadcrumb-item">
+            <Link to="/" className="text-decoration-none fw-medium" style={{ color: '#1565c0' }}>
+              Dự án
+            </Link>
+          </li>
+          <li className="breadcrumb-item">
+            <Link to="/" className="text-decoration-none fw-medium" style={{ color: '#1565c0' }}>
+              {projectName}
+            </Link>
+          </li>
+          <li className="breadcrumb-item active text-secondary fw-medium" aria-current="page">
+            Tin tức
+          </li>
+        </ol>
+      </nav>
 
       {/* Main Title & Share Row */}
-      <Box sx={{ mb: 2.5 }}>
-        <Typography
-          variant="h4"
-          component="h1"
-          sx={{
-            fontWeight: 800,
-            fontSize: { xs: '1.4rem', sm: '1.8rem', md: '2.1rem' },
+      <div className="mb-3">
+        <h1
+          className="fw-bold mb-2 text-uppercase"
+          style={{
             color: '#1555a6',
+            fontSize: 'calc(1.3rem + 0.9vw)',
             letterSpacing: '-0.3px',
             lineHeight: 1.3,
-            mb: 1.5,
-            textTransform: 'uppercase',
           }}
         >
           {news.title}
-        </Typography>
+        </h1>
 
         {/* Meta Info Bar: Date, Author, Share Button */}
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 2,
-            pt: 0.5,
-            pb: 1,
-            borderBottom: '1px solid #f1f5f9',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+        <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-2 pb-2 border-bottom">
+          <div className="d-flex align-items-center gap-4">
             {/* Date */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
-              <CalendarMonthOutlinedIcon sx={{ fontSize: 18, color: '#8c9ba5' }} />
-              <Typography sx={{ color: '#64748b', fontSize: '0.85rem', fontWeight: 500 }}>
-                {formattedDate}
-              </Typography>
-            </Box>
+            <div className="d-flex align-items-center gap-1 text-secondary" style={{ fontSize: '0.85rem' }}>
+              <i className="bi bi-calendar3" />
+              <span>{formattedDate}</span>
+            </div>
 
             {/* Author */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
-              <PersonOutlineOutlinedIcon sx={{ fontSize: 18, color: '#8c9ba5' }} />
-              <Typography sx={{ color: '#64748b', fontSize: '0.85rem', fontWeight: 500 }}>
-                Vinhomes.biz.vn
-              </Typography>
-            </Box>
-          </Box>
+            <div className="d-flex align-items-center gap-1 text-secondary" style={{ fontSize: '0.85rem' }}>
+              <i className="bi bi-person" />
+              <span>{authorName}</span>
+            </div>
+          </div>
 
           {/* Share Button */}
-          <Button
-            variant="contained"
+          <button
+            type="button"
             onClick={handleShare}
-            endIcon={<OpenInNewIcon sx={{ fontSize: '18px !important' }} />}
-            sx={{
-              background: 'linear-gradient(90deg, #2A52BE 0%, #00B4D8 100%)',
-              color: '#ffffff',
-              px: 2.5,
-              py: 0.8,
+            className="btn text-white fw-semibold d-inline-flex align-items-center gap-2 px-3 py-1 text-nowrap"
+            style={{
+              backgroundColor: '#0288d1',
               borderRadius: '6px',
               fontSize: '0.88rem',
-              fontWeight: 600,
-              boxShadow: 'none',
-              whiteSpace: 'nowrap',
-              '&:hover': {
-                bgcolor: '#0277bd',
-                boxShadow: '0 2px 8px rgba(2, 136, 209, 0.3)',
-                transition: 'all 0.1s ease-in-out',
-              },
+              border: 'none',
             }}
           >
-            Chia sẻ
-          </Button>
-        </Box>
-      </Box>
+            <span>Chia sẻ</span>
+            <i className="bi bi-box-arrow-up-right" style={{ fontSize: '13px' }} />
+          </button>
+        </div>
+      </div>
 
       {/* Hero / Cover Image if available */}
       {news.fileInfo?.fullLink && (
-        <Box
-          sx={{
-            width: '100%',
-            borderRadius: '12px',
-            overflow: 'hidden',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-            mb: 3.5,
-            bgcolor: '#f8fafc',
-          }}
-        >
-          <Box
-            component="img"
+        <div className="w-100 rounded-3 overflow-hidden shadow-sm mb-4 bg-light">
+          <img
             src={news.fileInfo.fullLink}
             alt={news.title}
-            sx={{
-              width: '100%',
-              maxHeight: { xs: 260, sm: 420, md: 520 },
-              objectFit: 'cover',
-              display: 'block',
-            }}
+            className="w-100 d-block object-fit-cover"
+            style={{ maxHeight: '520px' }}
           />
-        </Box>
+        </div>
       )}
 
       {/* Short Content / Lead Paragraph */}
       {news.shortContent && (
-        <Typography
-          variant="body1"
-          sx={{
-            fontSize: '1.05rem',
-            fontWeight: 500,
+        <div
+          className="p-3 mb-4 bg-light rounded-end border-start border-4 border-info"
+          style={{
+            fontSize: '1.02rem',
+            fontStyle: 'italic',
             lineHeight: 1.75,
             color: '#334155',
-            mb: 3,
-            fontStyle: 'italic',
-            borderLeft: '4px solid #0288d1',
-            pl: 2,
-            py: 0.5,
-            bgcolor: '#f8fafc',
-            borderRadius: '0 8px 8px 0',
           }}
         >
           {news.shortContent}
-        </Typography>
+        </div>
       )}
 
       {/* Main HTML Content */}
-      <Box
-        sx={{
+      <div
+        className="news-article-content mb-5"
+        style={{
           color: '#334155',
           fontSize: '0.98rem',
           lineHeight: 1.85,
-          mb: 6,
-          '& p': {
-            mb: 2.2,
-            lineHeight: 1.85,
-          },
-          '& img': {
-            maxWidth: '100%',
-            height: 'auto !important',
-            borderRadius: '12px',
-            margin: '20px auto',
-            display: 'block',
-            boxShadow: '0 4px 18px rgba(0, 0, 0, 0.08)',
-          },
-          '& h2, & h3, & h4': {
-            color: '#1555a6',
-            fontWeight: 700,
-            mt: 3,
-            mb: 1.5,
-          },
-          '& ul, & ol': {
-            pl: 3,
-            mb: 2.2,
-          },
-          '& li': {
-            mb: 0.8,
-          },
         }}
         dangerouslySetInnerHTML={{ __html: news.content || '' }}
       />
 
       {/* Related News Section ("TIN LIÊN QUAN") */}
-      <Box sx={{ mt: 6, pt: 4, borderTop: '2px solid #edf2f7' }}>
-        <Typography
-          variant="h5"
-          component="h2"
-          sx={{
-            fontWeight: 800,
-            fontSize: { xs: '1.25rem', sm: '1.45rem' },
+      <div className="mt-5 pt-4 border-top">
+        <h3
+          className="fw-bold mb-4 text-uppercase"
+          style={{
             color: '#1555a6',
+            fontSize: '1.35rem',
             letterSpacing: '-0.2px',
-            textTransform: 'uppercase',
-            mb: 3,
           }}
         >
           TIN LIÊN QUAN
-        </Typography>
+        </h3>
 
-        <Grid container spacing={{ xs: 2, sm: 2.5, md: 2.5 }}>
+        <div className="row g-3 g-md-4">
           {relatedNews.map((item) => (
-            <Grid key={item.id} size={{ xs: 12, sm: 6, md: 3 }}>
+            <div key={item.id} className="col-12 col-sm-6 col-lg-3">
               <NewsCard item={item} />
-            </Grid>
+            </div>
           ))}
-        </Grid>
-      </Box>
+        </div>
+      </div>
 
       {/* Share Toast */}
-      <Snackbar
-        open={copied}
-        autoHideDuration={3000}
-        onClose={() => setCopied(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="success" sx={{ width: '100%' }}>
-          Đã sao chép liên kết bài viết!
-        </Alert>
-      </Snackbar>
-    </Container>
+      {copied && (
+        <div
+          className="position-fixed bottom-0 start-50 translate-middle-x mb-4 alert alert-success d-flex align-items-center gap-2 shadow"
+          role="alert"
+          style={{ zIndex: 1200 }}
+        >
+          <i className="bi bi-check-circle-fill text-success" />
+          <span>Đã sao chép liên kết bài viết!</span>
+        </div>
+      )}
+    </div>
   );
 }
-

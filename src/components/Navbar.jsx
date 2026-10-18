@@ -1,26 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import {
-  AppBar,
-  Toolbar,
-  Container,
-  Box,
-  Typography,
-  IconButton,
-  Button,
-  useTheme,
-  useMediaQuery,
-  Menu,
-  MenuItem,
-} from '@mui/material';
-import PersonIcon from '@mui/icons-material/Person';
-import MenuIcon from '@mui/icons-material/Menu';
-import CircleIcon from '@mui/icons-material/Circle';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 
 export default function Navbar() {
-  const [mobileAnchor, setMobileAnchor] = useState(null);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -36,8 +18,8 @@ export default function Navbar() {
   }, []);
 
   const navItems = [
-    { label: 'GIỚI THIỆU', href: '/gioi-thieu' },
-    { label: 'DỰ ÁN', href: '/du-an' },
+    { label: 'GIỚI THIỆU', href: '#gioi-thieu' },
+    { label: 'DỰ ÁN', href: '#du-an' },
     { label: 'TIN TỨC', href: '/news' },
   ];
 
@@ -48,17 +30,14 @@ export default function Navbar() {
     const activeHash = location.hash || currentHash || window.location.hash;
     const fullPathWithHash = currentPath + activeHash;
 
-    // Exact match with path + hash or end of URL
     if (fullPathWithHash === href || window.location.href.endsWith(href)) {
       return true;
     }
 
-    // Hash link matching (e.g. #gioi-thieu, #du-an)
     if (href.startsWith('#')) {
       return activeHash === href;
     }
 
-    // Path matching (e.g. /news matches /news and /news/76)
     if (href.startsWith('/')) {
       if (href === '/') {
         return currentPath === '/' && !activeHash;
@@ -70,12 +49,12 @@ export default function Navbar() {
   };
 
   const handleNavClick = (e, href) => {
+    setMobileMenuOpen(false);
     if (href.startsWith('/')) {
       e.preventDefault();
       navigate(href);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (href.startsWith('#')) {
-      // If currently on another page (e.g. /news/76), navigate to home with hash
       if (location.pathname !== '/') {
         e.preventDefault();
         navigate('/' + href);
@@ -84,187 +63,126 @@ export default function Navbar() {
   };
 
   return (
-    <AppBar
-      position="sticky"
-      elevation={0}
-      sx={{
-        backgroundColor: '#ffffff',
-        borderBottom: '1px solid #edf2f7',
-        zIndex: 1100,
-      }}
-    >
-      <Container maxWidth="xl" sx={{ px: { xs: 2, md: 4 } }}>
-        <Toolbar
-          disableGutters
-          sx={{
-            height: 64,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+    <nav className="navbar navbar-expand-lg bg-white sticky-top border-bottom py-2" style={{ zIndex: 1100 }}>
+      <div className="container-xl px-3 px-md-4">
+        {/* Brand Logo */}
+        <div
+          onClick={() => {
+            navigate('/');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
+          className="navbar-brand d-flex align-items-center cursor-pointer m-0"
+          style={{ cursor: 'pointer', width: '242px', height: '36px' }}
         >
-          {/* Logo */}
-          <Box
-            onClick={() => {
-              navigate('/');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+          <img
+            src="/src/assets/Logo.svg"
+            alt="Logo"
+            style={{ maxHeight: '32px' }}
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
             }}
-            sx={{
-              width: 242,
-              height: 32,
-              display: 'flex',
-              alignItems: 'center',
-              cursor: 'pointer',
-            }}
-          >
-            <Box
-              component="img"
-              src="/src/assets/Logo.svg"
-              alt="Logo"
-              onError={(e) => {
-                e.target.style.display = 'none';
-              }}
-              sx={{ maxHeight: 32 }}
-            />
-          </Box>
+          />
+        </div>
 
-          {/* Desktop Navigation */}
-          {!isMobile ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3.5, height: '100%' }}>
-              {navItems.map((item) => {
-                const active = isItemActive(item.href);
-                return (
-                  <Button
-                    key={item.label}
+        {/* Desktop Nav Items */}
+        <div className="collapse navbar-collapse justify-content-center d-none d-lg-flex">
+          <ul className="navbar-nav gap-4">
+            {navItems.map((item) => {
+              const active = isItemActive(item.href);
+              return (
+                <li key={item.label} className="nav-item">
+                  <a
                     href={item.href}
                     onClick={(e) => handleNavClick(e, item.href)}
-                    sx={{
+                    className="nav-link px-2 py-2 fw-semibold text-uppercase"
+                    style={{
                       color: active ? '#0288d1' : '#475569',
                       fontSize: '0.85rem',
-                      fontWeight: active ? 700 : 600,
                       letterSpacing: '0.5px',
-                      height: '100%',
-                      py: 2.2,
-                      px: 1.5,
-                      borderRadius: 0,
-                      position: 'relative',
-                      // borderBottom: active ? '3px solid #0288d1' : '3px solid transparent',
+                      borderBottom: active ? '3px solid #0288d1' : '3px solid transparent',
                       textDecoration: active ? 'underline' : 'none',
                       textUnderlineOffset: '6px',
-                      textDecorationThickness: '2px',
                       transition: 'all 0.2s ease',
-                      // '&:hover': {
-                      //   color: '#0288d1',
-                      //   backgroundColor: 'transparent',
-                      // },
                     }}
                   >
                     {item.label}
-                  </Button>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        {/* Right side: Online Status & User Profile Avatar */}
+        <div className="d-flex align-items-center gap-2 gap-sm-3">
+          {/* Online badge */}
+          <div
+            className="d-flex align-items-center gap-2 bg-light border px-3 py-1 rounded-pill"
+            style={{ fontSize: '0.8rem' }}
+          >
+            <i
+              className="bi bi-circle-fill text-success"
+              style={{
+                fontSize: '8px',
+                animation: 'pulse 2s infinite',
+              }}
+            />
+            <span className="text-secondary fw-medium">120 người đang Online</span>
+          </div>
+
+          {/* User profile avatar button */}
+          <button
+            type="button"
+            className="btn rounded-circle d-flex align-items-center justify-content-center p-0 border-0"
+            style={{
+              width: '36px',
+              height: '36px',
+              background: 'linear-gradient(90deg, #2A52BE 0%, #00B4D8 100%)',
+              color: '#ffffff',
+            }}
+          >
+            <i className="bi bi-person-fill" style={{ fontSize: '18px' }} />
+          </button>
+
+          {/* Mobile menu hamburger toggle */}
+          <button
+            className="btn btn-link text-dark d-lg-none p-1 border-0"
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation"
+          >
+            <i className={`bi ${mobileMenuOpen ? 'bi-x-lg' : 'bi-list'}`} style={{ fontSize: '24px' }} />
+          </button>
+        </div>
+
+        {/* Mobile dropdown menu */}
+        {mobileMenuOpen && (
+          <div className="w-100 d-lg-none mt-2 pt-2 border-top">
+            <ul className="navbar-nav gap-2">
+              {navItems.map((item) => {
+                const active = isItemActive(item.href);
+                return (
+                  <li key={item.label} className="nav-item">
+                    <a
+                      href={item.href}
+                      onClick={(e) => handleNavClick(e, item.href)}
+                      className="nav-link px-3 py-2 fw-semibold"
+                      style={{
+                        color: active ? '#0288d1' : '#475569',
+                        textDecoration: active ? 'underline' : 'none',
+                        textUnderlineOffset: '4px',
+                        borderLeft: active ? '3px solid #0288d1' : 'none',
+                      }}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
                 );
               })}
-            </Box>
-          ) : null}
-
-          {/* Right side: Online Status & User Avatar */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2.5 } }}>
-            {/* Online Indicator */}
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.8,
-                bgcolor: '#f8fafc',
-                border: '1px solid #e2e8f0',
-                py: 0.5,
-                px: 1.5,
-                borderRadius: '16px',
-              }}
-            >
-              <CircleIcon
-                sx={{
-                  color: '#10b981',
-                  fontSize: '8px',
-                  animation: 'pulse 2s infinite',
-                  '@keyframes pulse': {
-                    '0%': { opacity: 1 },
-                    '50%': { opacity: 0.4 },
-                    '100%': { opacity: 1 },
-                  },
-                }}
-              />
-              <Typography
-                variant="body2"
-                sx={{
-                  color: '#475569',
-                  fontSize: { xs: '0.75rem', sm: '0.8rem' },
-                  fontWeight: 500,
-                }}
-              >
-                120 người đang Online
-              </Typography>
-            </Box>
-
-            {/* Profile Avatar Button */}
-            <IconButton
-              sx={{
-                width: 36,
-                height: 36,
-                background: 'linear-gradient(90deg, #2A52BE 0%, #00B4D8 100%)',
-                color: '#ffffff',
-                '&:hover': {
-                  bgcolor: '#0277bd',
-                },
-              }}
-            >
-              <PersonIcon sx={{ fontSize: 22 }} />
-            </IconButton>
-
-            {/* Mobile Hamburger Menu */}
-            {isMobile && (
-              <>
-                <IconButton
-                  onClick={(e) => setMobileAnchor(e.currentTarget)}
-                  sx={{ color: '#475569' }}
-                >
-                  <MenuIcon />
-                </IconButton>
-                <Menu
-                  anchorEl={mobileAnchor}
-                  open={Boolean(mobileAnchor)}
-                  onClose={() => setMobileAnchor(null)}
-                >
-                  {navItems.map((item) => {
-                    const active = isItemActive(item.href);
-                    return (
-                      <MenuItem
-                        key={item.label}
-                        onClick={(e) => {
-                          setMobileAnchor(null);
-                          handleNavClick(e, item.href);
-                        }}
-                        component="a"
-                        href={item.href}
-                        sx={{
-                          fontWeight: active ? 700 : 600,
-                          fontSize: '0.85rem',
-                          color: active ? '#0288d1' : '#475569',
-                          textDecoration: active ? 'underline' : 'none',
-                          textUnderlineOffset: '4px',
-                          borderLeft: active ? '3px solid #0288d1' : 'none',
-                          pl: active ? 1.5 : 2,
-                        }}
-                      >
-                        {item.label}
-                      </MenuItem>
-                    );
-                  })}
-                </Menu>
-              </>
-            )}
-          </Box>
-        </Toolbar>
-      </Container>
-    </AppBar>
+            </ul>
+          </div>
+        )}
+      </div>
+    </nav>
   );
 }

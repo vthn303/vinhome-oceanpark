@@ -1,23 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  Box,
-  Typography,
-  Grid,
-  Skeleton,
-  Alert,
-  Button,
-  TextField,
-  Autocomplete,
-  InputAdornment,
-  IconButton,
-  CircularProgress,
-  Chip,
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import ClearIcon from '@mui/icons-material/Clear';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import ApartmentIcon from '@mui/icons-material/Apartment';
-import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import NewsCard from './NewsCard';
 import PaginationBar from './PaginationBar';
 import { searchNews, searchProjects } from '../api/newsApi';
@@ -36,27 +17,39 @@ export default function NewsSection() {
   const [debouncedTitle, setDebouncedTitle] = useState('');
   const [selectedProject, setSelectedProject] = useState(null);
 
-  // Project Autocomplete State
+  // Project Dropdown State
   const [projectOptions, setProjectOptions] = useState([]);
   const [projectLoading, setProjectLoading] = useState(false);
   const [projectInput, setProjectInput] = useState('');
+  const [projectDropdownOpen, setProjectDropdownOpen] = useState(false);
+
   const projectTimerRef = useRef(null);
   const titleTimerRef = useRef(null);
+  const dropdownRef = useRef(null);
 
-  // Debounce searchTitle changes
+  // Debounce searchTitle
   useEffect(() => {
-    if (titleTimerRef.current) {
-      clearTimeout(titleTimerRef.current);
-    }
+    if (titleTimerRef.current) clearTimeout(titleTimerRef.current);
     titleTimerRef.current = setTimeout(() => {
       setDebouncedTitle(searchTitle);
-      setPage(1); // Reset to page 1 on search change
+      setPage(1);
     }, 350);
 
     return () => {
       if (titleTimerRef.current) clearTimeout(titleTimerRef.current);
     };
   }, [searchTitle]);
+
+  // Click outside to close project dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setProjectDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Initial load of projects list
   useEffect(() => {
@@ -75,26 +68,19 @@ export default function NewsSection() {
     fetchInitialProjects();
   }, []);
 
-  // Handle typing in project autocomplete with debounce
-  const handleProjectInputChange = (event, newInputValue) => {
-    setProjectInput(newInputValue);
+  // Handle typing in project input
+  const handleProjectInputChange = (e) => {
+    const val = e.target.value;
+    setProjectInput(val);
+    setProjectDropdownOpen(true);
 
-    if (projectTimerRef.current) {
-      clearTimeout(projectTimerRef.current);
-    }
+    if (projectTimerRef.current) clearTimeout(projectTimerRef.current);
 
     projectTimerRef.current = setTimeout(async () => {
-      if (!newInputValue.trim()) {
-        const res = await searchProjects({ pageSize: 50 });
-        const list = Array.isArray(res) ? res : res.data || [];
-        setProjectOptions(list);
-        return;
-      }
-
       setProjectLoading(true);
       try {
         const res = await searchProjects({
-          name: newInputValue.trim(),
+          name: val.trim() || undefined,
           pageSize: 30,
         });
         const list = Array.isArray(res) ? res : res.data || [];
@@ -107,15 +93,23 @@ export default function NewsSection() {
     }, 300);
   };
 
-  // Fetch news data whenever page, debouncedTitle, or selectedProject changes
+  // Select a project
+  const handleSelectProject = (project) => {
+    setSelectedProject(project);
+    setProjectInput(project ? project.name : '');
+    setProjectDropdownOpen(false);
+    setPage(1);
+  };
+
+  // Fetch news data
   const fetchNewsData = async (pageIndex, titleQuery, project) => {
     setLoading(true);
     setError(null);
     try {
       const params = {
-        pageNumber: pageIndex - 1, // 0-indexed
-        pageSize: pageSize, // 12 items per page
-        sort: 'createdAt:desc', // Sắp xếp theo ngày tạo mới nhất
+        pageNumber: pageIndex - 1,
+        pageSize: pageSize,
+        sort: 'createdAt:desc',
       };
 
       if (project && project.id) {
@@ -159,275 +153,194 @@ export default function NewsSection() {
     setSearchTitle('');
     setDebouncedTitle('');
     setSelectedProject(null);
+    setProjectInput('');
     setPage(1);
   };
 
   const hasActiveFilters = Boolean(searchTitle.trim() || selectedProject);
 
   return (
-    <Box id="tin-tuc" sx={{ width: '100%' }}>
-      {/* Header Row: Title & Indicator */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 2,
-          mb: 2,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Typography
-            variant="h5"
-            component="h2"
-            sx={{
-              fontWeight: 800,
-              fontSize: { xs: '1.25rem', sm: '1.45rem' },
-              color: '#1555a6',
-              letterSpacing: '-0.2px',
-              textTransform: 'uppercase',
-            }}
-          >
+    <div id="tin-tuc" className="w-100">
+      {/* Header Row: Title & Total Count */}
+      <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <div className="d-flex align-items-center gap-2">
+          <h2 className="fw-bold mb-0 text-uppercase" style={{ color: '#1555a6', fontSize: '1.4rem' }}>
             TIN TỨC
-          </Typography>
+          </h2>
+          {!loading && (
+            <span
+              className="badge rounded-pill fw-semibold"
+              style={{ backgroundColor: '#e0f2fe', color: '#0369a1', fontSize: '0.78rem' }}
+            >
+              {totalElements} tin tức
+            </span>
+          )}
+        </div>
 
-          {/* {!loading && (
-            <Chip
-              label={`${totalElements} tin tức`}
-              size="small"
-              sx={{
-                bgcolor: '#e0f2fe',
-                color: '#0369a1',
-                fontWeight: 600,
-                fontSize: '0.75rem',
-              }}
-            />
-          )} */}
-        </Box>
-
-        {loading && (
-          <Typography variant="caption" sx={{ color: '#0288d1', fontWeight: 500 }}>
-            Đang tải dữ liệu...
-          </Typography>
-        )}
-      </Box>
+        {loading && <span className="small text-primary fw-medium">Đang tải dữ liệu...</span>}
+      </div>
 
       {/* Search & Filter Bar */}
-      <Box
-        sx={{
-          bgcolor: '#ffffff',
-          p: { xs: 2, sm: 2.5 },
-          borderRadius: '12px',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
-          mb: 3,
-        }}
-      >
-        <Grid container spacing={2} alignItems="center">
+      <div className="bg-white p-3 p-md-4 rounded-3 border shadow-sm mb-4">
+        <div className="row g-3 align-items-center">
           {/* Autocomplete Dự Án */}
-          {/* <Grid size={{ xs: 12, md: 5 }}>
-            <Autocomplete
-              value={selectedProject}
-              onChange={(event, newValue) => {
-                setSelectedProject(newValue);
-                setPage(1); // Reset page on project change
-              }}
-              inputValue={projectInput}
-              onInputChange={handleProjectInputChange}
-              options={projectOptions}
-              getOptionLabel={(option) => option.name || ''}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              loading={projectLoading}
-              noOptionsText="Không tìm thấy dự án"
-              renderInput={(params) => {
-                const inputSlot = params.slotProps?.input || params.InputProps || {};
-                return (
-                  <TextField
-                    {...params}
-                    placeholder="Gõ tên để tìm & chọn dự án..."
-                    size="small"
-                    slotProps={{
-                      ...params.slotProps,
-                      input: {
-                        ...inputSlot,
-                        startAdornment: (
-                          <>
-                            <InputAdornment position="start">
-                              <ApartmentIcon sx={{ color: '#0288d1', fontSize: 20 }} />
-                            </InputAdornment>
-                            {inputSlot.startAdornment}
-                          </>
-                        ),
-                        endAdornment: (
-                          <>
-                            {projectLoading ? <CircularProgress color="inherit" size={18} sx={{ mr: 1 }} /> : null}
-                            {inputSlot.endAdornment}
-                          </>
-                        ),
-                      },
-                    }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: '8px',
-                        bgcolor: '#f8fafc',
-                        '&:hover': { bgcolor: '#ffffff' },
-                        '&.Mui-focused': { bgcolor: '#ffffff' },
-                      },
-                    }}
-                  />
-                );
-              }}
-            />
-          </Grid> */}
+          <div className="col-12 col-md-5" ref={dropdownRef}>
+            <div className="position-relative">
+              <div className="input-group">
+                <span className="input-group-text bg-light border-end-0">
+                  <i className="bi bi-building text-primary" />
+                </span>
+                <input
+                  type="text"
+                  className="form-control bg-light border-start-0"
+                  placeholder="Gõ tên để tìm & chọn dự án..."
+                  value={projectInput}
+                  onChange={handleProjectInputChange}
+                  onFocus={() => setProjectDropdownOpen(true)}
+                  style={{ fontSize: '0.88rem' }}
+                />
+                {selectedProject && (
+                  <button
+                    className="btn btn-outline-secondary border-start-0 bg-light"
+                    type="button"
+                    onClick={() => handleSelectProject(null)}
+                  >
+                    <i className="bi bi-x-lg" style={{ fontSize: '12px' }} />
+                  </button>
+                )}
+              </div>
+
+              {/* Dropdown menu */}
+              {projectDropdownOpen && (
+                <div
+                  className="dropdown-menu show w-100 shadow mt-1 p-0 overflow-auto"
+                  style={{ maxHeight: '250px', zIndex: 1050 }}
+                >
+                  <button
+                    type="button"
+                    className={`dropdown-item py-2 text-primary fw-semibold ${!selectedProject ? 'active' : ''}`}
+                    onClick={() => handleSelectProject(null)}
+                  >
+                    — Tất cả dự án —
+                  </button>
+                  {projectLoading ? (
+                    <div className="p-3 text-center text-muted small">Đang tìm dự án...</div>
+                  ) : projectOptions.length === 0 ? (
+                    <div className="p-3 text-center text-muted small">Không tìm thấy dự án</div>
+                  ) : (
+                    projectOptions.map((proj) => (
+                      <button
+                        key={proj.id}
+                        type="button"
+                        className={`dropdown-item py-2 small ${selectedProject?.id === proj.id ? 'active' : ''}`}
+                        onClick={() => handleSelectProject(proj)}
+                      >
+                        {proj.name}
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Search by News Title */}
-          <Grid size={{ xs: 12, md: 5 }}>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder="Tìm kiếm tin tức theo tiêu đề..."
-              value={searchTitle}
-              onChange={(e) => setSearchTitle(e.target.value)}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ color: '#64748b', fontSize: 20 }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: searchTitle ? (
-                    <InputAdornment position="end">
-                      <IconButton
-                        size="small"
-                        onClick={() => setSearchTitle('')}
-                        edge="end"
-                      >
-                        <ClearIcon sx={{ fontSize: 16 }} />
-                      </IconButton>
-                    </InputAdornment>
-                  ) : null,
-                },
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '8px',
-                  bgcolor: '#f8fafc',
-                  '&:hover': { bgcolor: '#ffffff' },
-                  '&.Mui-focused': { bgcolor: '#ffffff' },
-                },
-              }}
-            />
-          </Grid>
+          <div className="col-12 col-md-5">
+            <div className="input-group">
+              <span className="input-group-text bg-light border-end-0">
+                <i className="bi bi-search text-secondary" />
+              </span>
+              <input
+                type="text"
+                className="form-control bg-light border-start-0"
+                placeholder="Tìm kiếm tin tức theo tiêu đề..."
+                value={searchTitle}
+                onChange={(e) => setSearchTitle(e.target.value)}
+                style={{ fontSize: '0.88rem' }}
+              />
+              {searchTitle && (
+                <button
+                  className="btn btn-outline-secondary border-start-0 bg-light"
+                  type="button"
+                  onClick={() => setSearchTitle('')}
+                >
+                  <i className="bi bi-x-lg" style={{ fontSize: '12px' }} />
+                </button>
+              )}
+            </div>
+          </div>
 
-          {/* Reset Filters Button */}
-          {/* <Grid size={{ xs: 12, md: 2 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              size="medium"
+          {/* Clear Filters Button */}
+          <div className="col-12 col-md-2">
+            <button
+              type="button"
+              className="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-1"
               disabled={!hasActiveFilters}
               onClick={handleClearFilters}
-              startIcon={<FilterListOffIcon />}
-              sx={{
-                height: 40,
-                borderRadius: '8px',
-                borderColor: '#cbd5e1',
-                color: '#475569',
-                fontSize: '0.84rem',
-                fontWeight: 600,
-                '&:hover': {
-                  borderColor: '#0288d1',
-                  color: '#0288d1',
-                  bgcolor: '#f0f9ff',
-                },
-              }}
+              style={{ height: '38px', fontSize: '0.84rem' }}
             >
-              Xóa bộ lọc
-            </Button>
-          </Grid> */}
-        </Grid>
-      </Box>
+              <i className="bi bi-funnel" />
+              <span>Xóa bộ lọc</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
-      {/* Error Banner with Retry */}
+      {/* Error Alert */}
       {error && (
-        <Alert
-          severity="warning"
-          action={
-            <Button
-              color="inherit"
-              size="small"
-              startIcon={<RefreshIcon />}
-              onClick={() => fetchNewsData(page, debouncedTitle, selectedProject)}
-            >
-              Thử lại
-            </Button>
-          }
-          sx={{ mb: 3 }}
-        >
-          {error}
-        </Alert>
+        <div className="alert alert-warning d-flex align-items-center justify-content-between mb-4">
+          <div className="d-flex align-items-center gap-2">
+            <i className="bi bi-exclamation-triangle-fill" />
+            <span>{error}</span>
+          </div>
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-dark"
+            onClick={() => fetchNewsData(page, debouncedTitle, selectedProject)}
+          >
+            Thử lại
+          </button>
+        </div>
       )}
 
-      {/* Cards Grid or Empty State */}
+      {/* News Grid or Empty State */}
       {loading ? (
-        <Grid container spacing={{ xs: 2, sm: 2.5, md: 2.5 }}>
+        <div className="row g-3 g-md-4">
           {Array.from({ length: 4 }).map((_, index) => (
-            <Grid key={`skeleton-${index}`} size={{ xs: 12, sm: 6, md: 3 }}>
-              <Box
-                sx={{
-                  borderRadius: '10px',
-                  border: '1px solid #eaedf3',
-                  p: 1.5,
-                  bgcolor: '#ffffff',
-                }}
-              >
-                <Skeleton variant="rounded" height={140} sx={{ borderRadius: '8px', mb: 1.5 }} />
-                <Skeleton variant="text" sx={{ fontSize: '1rem', mb: 0.5 }} />
-                <Skeleton variant="text" width="60%" sx={{ fontSize: '0.8rem', mb: 1 }} />
-                <Skeleton variant="text" sx={{ fontSize: '0.75rem' }} />
-                <Skeleton variant="text" width="80%" sx={{ fontSize: '0.75rem' }} />
-              </Box>
-            </Grid>
+            <div key={`skeleton-${index}`} className="col-12 col-sm-6 col-lg-3">
+              <div className="card h-100 p-2 border rounded-3 placeholder-glow">
+                <div className="placeholder col-12 rounded-2 mb-2" style={{ height: '140px' }} />
+                <span className="placeholder col-10 mb-1" />
+                <span className="placeholder col-6 mb-2" />
+                <span className="placeholder col-12" />
+                <span className="placeholder col-8" />
+              </div>
+            </div>
           ))}
-        </Grid>
+        </div>
       ) : newsList.length === 0 ? (
-        <Box
-          sx={{
-            py: 8,
-            px: 3,
-            textAlign: 'center',
-            bgcolor: '#ffffff',
-            borderRadius: '12px',
-            border: '1px dashed #cbd5e1',
-            mb: 4,
-          }}
-        >
-          <SearchIcon sx={{ fontSize: 48, color: '#94a3b8', mb: 1.5 }} />
-          <Typography variant="h6" sx={{ color: '#1e293b', fontWeight: 600, mb: 1 }}>
-            Không tìm thấy tin tức nào
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#64748b', mb: 2.5 }}>
-            Không có kết quả nào phù hợp với từ khóa hoặc dự án đã chọn.
-          </Typography>
+        <div className="py-5 px-3 text-center bg-white rounded-3 border border-dashed mb-4">
+          <i className="bi bi-search text-muted" style={{ fontSize: '42px' }} />
+          <h5 className="fw-semibold text-dark mt-2 mb-1">Không tìm thấy tin tức nào</h5>
+          <p className="text-secondary small mb-3">Không có kết quả nào phù hợp với từ khóa hoặc dự án đã chọn.</p>
           {hasActiveFilters && (
-            <Button
-              variant="contained"
+            <button
+              type="button"
+              className="btn btn-primary btn-sm rounded-pill px-4"
               onClick={handleClearFilters}
-              sx={{ bgcolor: '#0288d1', borderRadius: '8px' }}
             >
               Xóa bộ lọc tìm kiếm
-            </Button>
+            </button>
           )}
-        </Box>
+        </div>
       ) : (
-        <Grid container spacing={{ xs: 2, sm: 2.5, md: 2.5 }}>
+        <div className="row g-3 g-md-4">
           {newsList.map((item) => (
-            <Grid key={item.id} size={{ xs: 12, sm: 6, md: 3 }}>
+            <div key={item.id} className="col-12 col-sm-6 col-lg-3">
               <NewsCard item={item} />
-            </Grid>
+            </div>
           ))}
-        </Grid>
+        </div>
       )}
 
       {/* Pagination Bar */}
@@ -438,6 +351,6 @@ export default function NewsSection() {
           onPageChange={handlePageChange}
         />
       )}
-    </Box>
+    </div>
   );
 }

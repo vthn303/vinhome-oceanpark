@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Card, CardMedia, CardContent, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 // Helper to format ISO date to DD/MM/YYYY
@@ -21,7 +20,6 @@ export default function NewsCard({ item }) {
   const [imgError, setImgError] = useState(false);
   const navigate = useNavigate();
 
-  // Extract fields whether from API or legacy mock format
   const title = item.title || 'Dự án Vinhomes';
   const excerpt = item.shortContent || item.excerpt || '';
   const dateFormatted = item.createdAt ? formatDate(item.createdAt) : (item.date || '12/02/2026');
@@ -35,64 +33,46 @@ export default function NewsCard({ item }) {
   };
 
   return (
-    <Card
-      elevation={0}
+    <div
       onClick={handleClick}
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: '10px',
-        border: '1px solid #eaedf3',
-        bgcolor: '#ffffff',
-        overflow: 'hidden',
+      className="card h-100 shadow-sm border rounded-3 overflow-hidden text-start"
+      style={{
         cursor: 'pointer',
         transition: 'all 0.25s ease-in-out',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: '0 10px 24px rgba(15, 23, 42, 0.08)',
-          borderColor: '#cbd5e1',
-          '& .news-title': {
-            color: '#0288d1',
-          },
-        },
+        backgroundColor: '#ffffff',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.boxShadow = '0 10px 24px rgba(15, 23, 42, 0.08)';
+        const titleEl = e.currentTarget.querySelector('.news-card-title');
+        if (titleEl) titleEl.style.color = '#0288d1';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '';
+        const titleEl = e.currentTarget.querySelector('.news-card-title');
+        if (titleEl) titleEl.style.color = '#1a365d';
       }}
     >
-      <Box sx={{ position: 'relative', pt: '58%', overflow: 'hidden', bgcolor: '#f1f5f9' }}>
-        <CardMedia
-          component="img"
-          image={imageUrl}
+      {/* Thumbnail Aspect Ratio Container */}
+      <div className="position-relative w-100 bg-light overflow-hidden" style={{ paddingTop: '58%' }}>
+        <img
+          src={imageUrl}
           alt={title}
           onError={() => setImgError(true)}
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            transition: 'transform 0.4s ease',
-            '&:hover': {
-              transform: 'scale(1.04)',
-            },
-          }}
+          className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover"
+          style={{ transition: 'transform 0.4s ease' }}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.04)')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
         />
-      </Box>
+      </div>
 
-      <CardContent
-        sx={{
-          p: 2,
-          flexGrow: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          '&:last-child': { pb: 2 },
-        }}
-      >
-        <Typography
-          className="news-title"
-          component="h3"
-          sx={{
-            fontWeight: 700,
+      {/* Card Body */}
+      <div className="card-body p-3 d-flex flex-column">
+        {/* Title: 2 lines max with ellipsis */}
+        <h5
+          className="news-card-title fw-bold mb-2"
+          style={{
             fontSize: '0.92rem',
             lineHeight: 1.35,
             color: '#1a365d',
@@ -101,30 +81,21 @@ export default function NewsCard({ item }) {
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            mb: 0.8,
             transition: 'color 0.2s ease',
           }}
         >
           {title}
-        </Typography>
+        </h5>
 
-        <Typography
-          variant="caption"
-          sx={{
-            color: '#94a3b8',
-            fontSize: '0.75rem',
-            fontWeight: 400,
-            mb: 1,
-            display: 'block',
-          }}
-        >
+        {/* Date */}
+        <div className="text-muted mb-2" style={{ fontSize: '0.75rem' }}>
           {dateFormatted}
-        </Typography>
+        </div>
 
-        <Typography
-          variant="body2"
-          sx={{
-            color: '#64748b',
+        {/* Short Content: 3 lines max with ellipsis */}
+        <p
+          className="text-secondary mb-0"
+          style={{
             fontSize: '0.8rem',
             lineHeight: 1.45,
             display: '-webkit-box',
@@ -135,8 +106,8 @@ export default function NewsCard({ item }) {
           }}
         >
           {excerpt}
-        </Typography>
-      </CardContent>
-    </Card>
+        </p>
+      </div>
+    </div>
   );
 }
