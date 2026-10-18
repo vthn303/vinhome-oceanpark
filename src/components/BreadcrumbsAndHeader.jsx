@@ -100,7 +100,7 @@ export default function BreadcrumbsAndHeader() {
           onClick={handleShare}
           endIcon={<OpenInNewIcon sx={{ fontSize: '18px !important' }} />}
           sx={{
-            bgcolor: '#0288d1',
+            background: 'linear-gradient(90deg, #2A52BE 0%, #00B4D8 100%)',
             color: '#ffffff',
             px: 2.5,
             py: 0.9,
@@ -112,6 +112,7 @@ export default function BreadcrumbsAndHeader() {
             '&:hover': {
               bgcolor: '#0277bd',
               boxShadow: '0 2px 8px rgba(2, 136, 209, 0.3)',
+              transition: 'all 0.1s ease-in-out',
             },
           }}
         >

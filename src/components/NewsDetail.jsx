@@ -204,7 +204,7 @@ export default function NewsDetail() {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
               <PersonOutlineOutlinedIcon sx={{ fontSize: 18, color: '#8c9ba5' }} />
               <Typography sx={{ color: '#64748b', fontSize: '0.85rem', fontWeight: 500 }}>
-                {authorName}
+                Vinhomes.biz.vn
               </Typography>
             </Box>
           </Box>
@@ -215,7 +215,7 @@ export default function NewsDetail() {
             onClick={handleShare}
             endIcon={<OpenInNewIcon sx={{ fontSize: '18px !important' }} />}
             sx={{
-              bgcolor: '#0288d1',
+              background: 'linear-gradient(90deg, #2A52BE 0%, #00B4D8 100%)',
               color: '#ffffff',
               px: 2.5,
               py: 0.8,
@@ -227,6 +227,7 @@ export default function NewsDetail() {
               '&:hover': {
                 bgcolor: '#0277bd',
                 boxShadow: '0 2px 8px rgba(2, 136, 209, 0.3)',
+                transition: 'all 0.1s ease-in-out',
               },
             }}
           >
