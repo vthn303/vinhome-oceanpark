@@ -1,10 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardMedia, CardContent, Typography, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+
+// Helper to format ISO date to DD/MM/YYYY
+function formatDate(dateInput) {
+  if (!dateInput) return '12/02/2026';
+  try {
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return dateInput;
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  } catch {
+    return dateInput;
+  }
+}
 
 export default function NewsCard({ item }) {
+  const [imgError, setImgError] = useState(false);
+  const navigate = useNavigate();
+
+  // Extract fields whether from API or legacy mock format
+  const title = item.title || 'Dự án Vinhomes';
+  const excerpt = item.shortContent || item.excerpt || '';
+  const dateFormatted = item.createdAt ? formatDate(item.createdAt) : (item.date || '12/02/2026');
+  const imageUrl = !imgError && item.fileInfo?.fullLink ? item.fileInfo.fullLink : (item.image || '/assets/news-thumb.png');
+
+  const handleClick = () => {
+    if (item.id) {
+      navigate(`/news/${item.id}`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <Card
       elevation={0}
+      onClick={handleClick}
       sx={{
         height: '100%',
         display: 'flex',
@@ -25,11 +58,12 @@ export default function NewsCard({ item }) {
         },
       }}
     >
-      <Box sx={{ position: 'relative', pt: '58%', overflow: 'hidden' }}>
+      <Box sx={{ position: 'relative', pt: '58%', overflow: 'hidden', bgcolor: '#f1f5f9' }}>
         <CardMedia
           component="img"
-          image={item.image}
-          alt={item.title}
+          image={imageUrl}
+          alt={title}
+          onError={() => setImgError(true)}
           sx={{
             position: 'absolute',
             top: 0,
@@ -71,7 +105,7 @@ export default function NewsCard({ item }) {
             transition: 'color 0.2s ease',
           }}
         >
-          {item.title}
+          {title}
         </Typography>
 
         <Typography
@@ -84,7 +118,7 @@ export default function NewsCard({ item }) {
             display: 'block',
           }}
         >
-          {item.date}
+          {dateFormatted}
         </Typography>
 
         <Typography
@@ -94,16 +128,15 @@ export default function NewsCard({ item }) {
             fontSize: '0.8rem',
             lineHeight: 1.45,
             display: '-webkit-box',
-            WebkitLineClamp: 2,
+            WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
           }}
         >
-          {item.excerpt}
+          {excerpt}
         </Typography>
       </CardContent>
     </Card>
   );
 }
-

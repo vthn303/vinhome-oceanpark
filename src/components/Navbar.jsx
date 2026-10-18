@@ -15,7 +15,7 @@ import {
 import PersonIcon from '@mui/icons-material/Person';
 import MenuIcon from '@mui/icons-material/Menu';
 import CircleIcon from '@mui/icons-material/Circle';
-import Logo from './Logo';
+// import Logo from './Logo';
 
 export default function Navbar() {
   const [mobileAnchor, setMobileAnchor] = React.useState(null);
@@ -25,7 +25,7 @@ export default function Navbar() {
   const navItems = [
     { label: 'GIỚI THIỆU', href: '#gioi-thieu' },
     { label: 'DỰ ÁN', href: '#du-an' },
-    { label: 'TIN TỨC', href: '#tin-tuc' },
+    { label: 'TIN TỨC', href: '/news' },
   ];
 
   return (
@@ -50,14 +50,25 @@ export default function Navbar() {
         >
           {/* Logo */}
           <Box
+            onClick={() => window.location.href = '/'}
             sx={{
+              width: 242,
+              height: 32,
               display: 'flex',
               alignItems: 'center',
               cursor: 'pointer',
-              gap: 1,
             }}
           >
-            <Logo size={32} />
+            <Box
+              component="img"
+              src="/src/assets/Logo.svg"
+              alt="Logo"
+              onError={(e) => {
+                // Fallback if Logo.svg not found
+                e.target.style.display = 'none';
+              }}
+              sx={{ maxHeight: 32 }}
+            />
           </Box>
 
           {/* Desktop Navigation */}
@@ -128,7 +139,7 @@ export default function Navbar() {
               sx={{
                 width: 36,
                 height: 36,
-                bgcolor: '#0288d1',
+                background: 'linear-gradient(90deg, #2A52BE 0%, #00B4D8 100%)',
                 color: '#ffffff',
                 '&:hover': {
                   bgcolor: '#0277bd',

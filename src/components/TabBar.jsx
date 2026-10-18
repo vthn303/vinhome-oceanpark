@@ -26,13 +26,13 @@ export default function TabBar({ currentTab = 'tin-tuc', onTabChange }) {
     <Box
       sx={{
         width: '100%',
-        background: 'linear-gradient(90deg, #2b55d3 0%, #1778dc 45%, #009ddb 80%, #00a8e8 100%)',
-        borderRadius: '10px',
-        p: { xs: 0.6, sm: 0.8 },
+        background: 'linear-gradient(90deg, #2A52BE 0%, #00B4D8 100%)',
+        borderRadius: '16px',
+        p: { xs: 1, sm: 2 },
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: { xs: 0.5, sm: 1 },
+        gap: { xs: 1, sm: 3 },
         overflowX: 'auto',
         scrollbarWidth: 'none',
         '&::-webkit-scrollbar': { display: 'none' },
@@ -50,8 +50,8 @@ export default function TabBar({ currentTab = 'tin-tuc', onTabChange }) {
             sx={{
               flex: { xs: 'none', md: 1 },
               minWidth: 'fit-content',
-              py: { xs: 0.7, sm: 0.85 },
-              px: { xs: 1.5, sm: 1.8 },
+              py: { xs: 0.7, sm: 2 },
+              px: { xs: 1.5, sm: 3   },
               borderRadius: '20px',
               fontSize: { xs: '0.78rem', sm: '0.84rem' },
               fontWeight: isActive ? 700 : 500,
