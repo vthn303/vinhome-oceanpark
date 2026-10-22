@@ -226,7 +226,7 @@ export default function NewsSection() {
       >
         <Grid container spacing={2} alignItems="center">
           {/* Autocomplete Dự Án */}
-          {/* <Grid size={{ xs: 12, md: 5 }}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <Autocomplete
               value={selectedProject}
               onChange={(event, newValue) => {
@@ -279,7 +279,7 @@ export default function NewsSection() {
                 );
               }}
             />
-          </Grid> */}
+          </Grid>
 
           {/* Search by News Title */}
           <Grid size={{ xs: 12, md: 5 }}>

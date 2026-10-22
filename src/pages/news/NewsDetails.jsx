@@ -16,8 +16,8 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
-import { getNewsDetail, searchNews } from '../api/newsApi';
-import NewsCard from './NewsCard';
+import { getNewsDetail, searchNews } from '../../api/newsApi';
+import NewsCard from '../../components/NewsCard';
 
 // Helper to format ISO date to DD/MM/YYYY
 function formatDate(dateInput) {
@@ -34,7 +34,7 @@ function formatDate(dateInput) {
   }
 }
 
-export default function NewsDetail() {
+export default function NewsDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
